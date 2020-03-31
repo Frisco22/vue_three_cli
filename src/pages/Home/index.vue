@@ -1,15 +1,15 @@
 <template>
   <div class="model_content">
-    <model-obj id="place" :src="`${publicPath}obj/sh.obj`" :mtl="`${publicPath}obj/sh.mtl`" backgroundColor="rgb(0,0,0)"
+    <!-- <model-obj id="place" :src="`${publicPath}obj/sh.obj`" :mtl="`${publicPath}obj/sh.mtl`" backgroundColor="rgb(0,0,0)"
       :scale="{ x: 2, y: 2, z: 2 }" :rotation="rotation">
-    </model-obj>
+    </model-obj> -->
     <!-- <div class="building_content">
       <model-obj id="place" :src="`${publicPath}obj/building.obj`" :mtl="`${publicPath}obj/building.mtl`"
         backgroundColor="rgb(0,0,0)" :scale="{ x: 2, y: 2, z: 2 }" :rotation="rotation">
       </model-obj>
       <model-three id="demo" :src="`${publicPath}js/czz3.js`"></model-three>
     </div> -->
-    <model-obj id="hh" :src="`${publicPath}obj/building.obj`" :mtl="`${publicPath}obj/building.mtl`"
+    <model-obj id="hh" :src="`${publicPath}obj/square.obj`" :mtl="`${publicPath}obj/square.mtl`"
       backgroundColor="rgb(0,0,0)" :scale="{ x: 2, y: 2, z: 2 }" :rotation="rotation">
     </model-obj>
     <!-- <model-obj class="square_model" id="square" :src="`${publicPath}obj/square.obj`"
