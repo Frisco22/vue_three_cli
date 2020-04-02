@@ -5,15 +5,12 @@
 </template>
 
 <script>
-
-// import * as THREE from 'three'
-import { MTLLoader, OBJLoader } from 'three-obj-mtl-loader'
+// import { MTLLoader, OBJLoader } from 'three-obj-mtl-loader'
 // x轴正方向向右，y轴正方向向上，z轴由屏幕从里向外
-// import TWEEN from '@tweenjs/tween.js'
-// // import dat from 'dat.gui' // 使用dat.GUI库实现图形控制界面
+// import dat from 'dat.gui' // 使用dat.GUI库实现图形控制界面
 
 export default {
-  name: 'ThreeTest',
+  name: 'Light',
   data () {
     return {
       publicPath: process.env.BASE_URL,
@@ -21,8 +18,8 @@ export default {
       camera: null, // 相机
       renderer: null, // 渲染器
       cube: null,  // 立方体
-      geometry: null, // 声明一个几何体
-      material: null, // 材质
+      geometry: {}, // 声明一个几何体
+      material: {}, // 材质
       controls: null, // 鼠标控制
       light: null, // 灯光
       clientWidth: 1000, // 宽度
@@ -54,9 +51,9 @@ export default {
     initCamera () {
       const that = this
       that.camera = new that.THREE.PerspectiveCamera(45, that.clientWidth / that.clientHeight, 1, 10000);
-      that.camera.position.x = 0;
-      that.camera.position.y = 1000;
-      that.camera.position.z = 0;
+      that.camera.position.x = 600;
+      that.camera.position.y = 0;
+      that.camera.position.z = 600;
       that.camera.up.x = 0;
       that.camera.up.y = 0;
       that.camera.up.z = 1;
@@ -79,13 +76,16 @@ export default {
     // 初始化灯光
     initLight () {
       const that = this
-      that.light = new that.THREE.DirectionalLight(0xFF0000, 1.0, 0);
+      that.light = new that.THREE.DirectionalLight(0xFF0000, 1.0, 0); //方向光（平行光）
+      // that.light = new that.THREE.AmbientLight(0xFF0000); // Lambert材质会受环境光的影响，呈现环境光的颜色，与材质本身颜色关系不大。
+      // that.light = new that.THREE.PointLight(0xFF0000); // 点光源是理想化为质点的向四面八方发出光线的光源
       that.light.position.set(100, 100, 200);
       that.scene.add(that.light);
     },
     // 立方体
     initObject () {
       const that = this
+
       // that.geometry = new THREE.Geometry();
       // that.geometry.vertices.push(new THREE.Vector3(- 500, 0, 0));
       // that.geometry.vertices.push(new THREE.Vector3(500, 0, 0));
@@ -101,36 +101,44 @@ export default {
       //   that.scene.add(line1);
 
       // }
-      that.geometry = new that.THREE.CylinderGeometry(100, 150, 400)
-      that.material = new that.THREE.MeshLambertMaterial({ color: 0xFFFF00 })
-      that.mesh = new that.THREE.Mesh(that.geometry, that.material)
-      that.mesh.position = new that.THREE.Vector3(0, 0, 0)
-      that.scene.add(that.mesh)
-    },
-    load3DModel () {
-      const that = this
-      new MTLLoader().load(`${that.publicPath}obj/building.mtl`, function (materials) {
-        materials.preload();
-        new OBJLoader().setMaterials(materials).load(`${that.publicPath}obj/building.obj`, function (object) {
-          that.scene.add(object);
-          // animate();
-        });
 
-      });
-    },
-    //外部模型加载函数
-    loadObj () {
-      const that = this
-      //包含材质
-      new that.THREE.MTLLoader().load(`${that.publicPath}obj/building.mtl`, materials => {
-        materials.preload()
-        new that.THREE.OBJLoader().setMaterials(materials).load(`${that.publicPath}obj/building.obj`, obj => {
-          console.log("materials", obj)
-          obj.scale.set(1, 1, 1)
-          obj.position.set(0, 0, 0)
-          that.scene.add(obj)
-        })
-      })
+      // that.geometry = new that.THREE.CylinderGeometry(100, 150, 400)
+      // that.material = new that.THREE.MeshLambertMaterial({ color: 0x19B2DE }); //0xFFFF00
+
+      // that.mesh = new that.THREE.Mesh(that.geometry, that.material)
+      // that.mesh.position = new that.THREE.Vector3(0, 0, 0)
+      // that.scene.add(that.mesh)
+
+      that.geometry = new that.THREE.CubeGeometry(200, 100, 50, 4, 4);
+      that.material = new that.THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+      that.mesh = new that.THREE.Mesh(that.geometry, that.material);
+      that.mesh.position.set(0, 0, 0);
+      that.scene.add(that.mesh);
+
+      let geometry2 = new that.THREE.CubeGeometry(200, 100, 50, 4, 4);
+      let material2 = new that.THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+      let mesh2 = new that.THREE.Mesh(geometry2, material2);
+      mesh2.position.set(-300, 0, 0);
+      that.scene.add(mesh2);
+
+      let geometry3 = new that.THREE.CubeGeometry(200, 100, 50, 4, 4);
+      let material3 = new that.THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+      let mesh3 = new that.THREE.Mesh(geometry3, material3);
+      mesh3.position.set(0, -150, 0);
+      that.scene.add(mesh3);
+
+      let mesh4 = new that.THREE.Mesh(geometry3, material3);
+      mesh4.position.set(0, 150, 0);
+      that.scene.add(mesh4);
+
+      let mesh5 = new that.THREE.Mesh(geometry3, material3);
+      mesh5.position.set(300, 0, 0);
+      that.scene.add(mesh5);
+
+      let mesh6 = new that.THREE.Mesh(geometry3, material3);
+      mesh6.position.set(0, 0, -100);
+      that.scene.add(mesh6);
+
     },
     // 动画
     animation () {
@@ -138,11 +146,11 @@ export default {
       const that = this
       // that.camera.position.x = that.camera.position.x + 1; // 移动相机
       // that.mesh.position.x -= 1; // 移动物体
-
+      that.renderer.clear();
       that.renderer.render(that.scene, that.camera);
-      requestAnimationFrame(that.animation);
+      // requestAnimationFrame(that.animation);
       // that.stats.update();
-      that.TWEEN.update();
+      // that.TWEEN.update();
 
     },
     // 性能监视器
@@ -161,6 +169,7 @@ export default {
         that.stats.end();
       }, 1000 / 60);
     },
+    // 初始化tween
     initTween () {
       const that = this
       new that.TWEEN.Tween(that.mesh.position)
@@ -176,7 +185,7 @@ export default {
       that.initLight() //创建光源
       that.initObject()
       that.initTween()
-      // that.load3DModel()
+
       that.initStats() //创建资源监控
 
       that.animation()
