@@ -5,7 +5,6 @@
 </template>
 
 <script>
-// import { MTLLoader, OBJLoader } from 'three-obj-mtl-loader'
 // x轴正方向向右，y轴正方向向上，z轴由屏幕从里向外
 // import dat from 'dat.gui' // 使用dat.GUI库实现图形控制界面
 

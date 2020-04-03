@@ -13,6 +13,9 @@ export default {
 </script>
 
 <style>
+html {
+  touch-action: none;
+}
 body {
   margin: 0;
   padding: 0;

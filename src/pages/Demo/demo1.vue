@@ -8,6 +8,7 @@
 
 // import * as THREE from 'three'
 import { MTLLoader, OBJLoader } from 'three-obj-mtl-loader'
+// import { OBJLoader, MTLLoader } from 'three-obj-mtl-loader-wpk'
 // x轴正方向向右，y轴正方向向上，z轴由屏幕从里向外
 // import TWEEN from '@tweenjs/tween.js'
 // // import dat from 'dat.gui' // 使用dat.GUI库实现图形控制界面
@@ -52,7 +53,11 @@ export default {
     },
     // 初始化相机
     initCamera () {
+      // camera.postion：相机所在的位置，默认为（0，0，0）
+      // camera.lookAt：相机焦点方向，默认为Z轴负半轴方向
+      // camera.up：坐标轴向上方向，默认（0，1，0）。PS：要设置在camera.lookAt前才有效
       const that = this
+      //创建一个透视相机，设置相机视角45度，最远能看1000，最近能看1
       that.camera = new that.THREE.PerspectiveCamera(45, that.clientWidth / that.clientHeight, 1, 10000);
       that.camera.position.x = 0;
       that.camera.position.y = 1000;

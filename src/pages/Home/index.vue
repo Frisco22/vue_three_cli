@@ -9,7 +9,10 @@
       </model-obj>
       <model-three id="demo" :src="`${publicPath}js/czz3.js`"></model-three>
     </div> -->
-    <model-obj id="hh" :src="`${publicPath}obj/square.obj`" :mtl="`${publicPath}obj/square.mtl`"
+    <!-- <model-obj id="building" :src="`${publicPath}obj/building.obj`" :mtl="`${publicPath}obj/building.mtl`"
+      backgroundColor="rgb(0,0,0)" :scale="{ x: 2, y: 2, z: 2 }" :rotation="rotation">
+    </model-obj> -->
+    <model-obj id="hh" :src="`${publicPath}obj/building1.obj`" :mtl="`${publicPath}obj/building1.mtl`"
       backgroundColor="rgb(0,0,0)" :scale="{ x: 2, y: 2, z: 2 }" :rotation="rotation">
     </model-obj>
     <!-- <model-obj class="square_model" id="square" :src="`${publicPath}obj/square.obj`"

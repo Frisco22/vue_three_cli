@@ -1,33 +1,28 @@
 <template>
-  <div>
-    <div class="canvas-frame"></div>
-  </div>
+  <div id="canvas-frame"></div>
 </template>
 
 <script>
-// import { MTLLoader, OBJLoader } from 'three-obj-mtl-loader'
 // x轴正方向向右，y轴正方向向上，z轴由屏幕从里向外
 // import dat from 'dat.gui' // 使用dat.GUI库实现图形控制界面
-
+import { OBJLoader, MTLLoader } from 'three-obj-mtl-loader'
 export default {
   name: 'Light',
   data () {
     return {
       publicPath: process.env.BASE_URL,
-      scene: null,  // 场景
-      camera: null, // 相机
-      renderer: null, // 渲染器
+      scene: {},  // 场景
+      camera: {}, // 相机
+      renderer: {}, // 渲染器
       cube: null,  // 立方体
       geometry: {}, // 声明一个几何体
       material: {}, // 材质
-      controls: null, // 鼠标控制
-      light: null, // 灯光
-      clientWidth: 1000, // 宽度
-      clientHeight: 900, // 高度
+      controls: {}, // 鼠标控制
+      light: {}, // 灯光
       mesh: {}, //网格
       stats: {}, //性能监听组件
-      zz: null,
-      clock: null
+      clock: null,
+      dom: {}
     }
   },
   components: {
@@ -37,10 +32,13 @@ export default {
     // this.threeStart()
   },
   mounted () {
+    this.dom = document.getElementById('canvas-frame')
     this.threeStart()
   },
   methods: {
-    init () {
+    render () {
+      //将场景相机渲染到页面
+      this.renderer.render(this.scene, this.camera)
     },
     // 初始化场景
     initScene () {
@@ -50,7 +48,7 @@ export default {
     // 初始化相机
     initCamera () {
       const that = this
-      that.camera = new that.THREE.PerspectiveCamera(45, that.clientWidth / that.clientHeight, 1, 10000);
+      that.camera = new that.THREE.PerspectiveCamera(45, that.dom.clientWidth / that.dom.clientHeight, 1, 10000);
       that.camera.position.x = 600;
       that.camera.position.y = 0;
       that.camera.position.z = 600;
@@ -61,26 +59,70 @@ export default {
       that.camera.lookAt(new that.THREE.Vector3(0, 0, 0))
     },
     // 初始化渲染器
-    initThree () {
+    initRenderer () {
       const that = this
-      // that.clientWidth = document.getElementById('canvas-frame').clientWidth;
-      // that.clientHeight = document.getElementById('canvas-frame').clientHeight;
       that.renderer = new that.THREE.WebGLRenderer({
         antialias: true // 属性开启用于抗锯齿
-      });
-      that.renderer.setSize(that.clientWidth, that.clientHeight);
-      document.body.appendChild(that.renderer.domElement);
-      // document.getElementById('canvas-frame').appendChild(that.renderer.domElement);
-      that.renderer.setClearColor(0x666666, 1.0);
+      })
+      that.renderer.setSize(that.dom.clientWidth, that.dom.clientHeight) //设置渲染器尺寸 等于模块宽高
+      that.dom.appendChild(that.renderer.domElement) //将渲染器添加到页面上
+
+      that.renderer.setClearColor(0x000000, 1.0);
+    },
+    // 初始化控制器
+    initControls () {
+      const that = this
+      that.controls = new that.TrackballControls(that.camera)
+      //旋转速度
+      that.controls.rotateSpeed = 5;
+      //变焦速度
+      that.controls.zoomSpeed = 3;
+      //平移速度
+      that.controls.panSpeed = 0.5;
+      //是否不变焦
+      that.controls.noZoom = false;
+      //是否不平移
+      that.controls.noPan = false;
+      //是否开启移动惯性
+      that.controls.staticMoving = false;
+      //动态阻尼系数 就是灵敏度
+      that.controls.dynamicDampingFactor = 0.3;
+      //未知，占时先保留
+      //controls.keys = [ 65, 83, 68 ];
+      that.controls.addEventListener('change', that.render, { passive: false });
+      //变化时触发渲染方法
+    },
+    onWindowResize () {
+      const that = this
+      that.camera.aspect = that.dom.clientWidth / that.dom.clientHeight;
+      //更新镜头长宽比
+      that.camera.updateProjectionMatrix();
+      //更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
+      that.controls.handleResize();
+      //轨迹球适应窗口的功能 文档没有查到相关 依样画葫芦
+      that.render();
+      //从新渲染
+      that.renderer.setSize(that.dom.clientWidth, that.dom.clientWidth);
+      //设置渲染器宽长
     },
     // 初始化灯光
     initLight () {
       const that = this
-      that.light = new that.THREE.DirectionalLight(0xFF0000, 1.0, 0); //方向光（平行光）
-      // that.light = new that.THREE.AmbientLight(0xFF0000); // Lambert材质会受环境光的影响，呈现环境光的颜色，与材质本身颜色关系不大。
-      // that.light = new that.THREE.PointLight(0xFF0000); // 点光源是理想化为质点的向四面八方发出光线的光源
-      that.light.position.set(100, 100, 200);
+      that.light = new that.THREE.AmbientLight(0xFFFFFF, 5.0, 0); //方向光（平行光）
+      // that.light = new that.THREE.AmbientLight(0x19B2DE); // Lambert材质会受环境光的影响，呈现环境光的颜色，与材质本身颜色关系不大。
+      // that.light = new that.THREE.PointLight(0x19B2DE); // 点光源是理想化为质点的向四面八方发出光线的光源
+      that.light.position.set(1, 1, 1);
       that.scene.add(that.light);
+
+      // that.scene.add(new that.THREE.AmbientLight(0x404040))
+      // //向场景添加环境光
+      let light1 = new that.THREE.DirectionalLight(0xFFFFFF, 5.0, 0)//缺省值光照强度 0 -1
+      // //创建平行光 常常用平行光来模拟太阳光 的效果; 太阳足够远，因此我们可以认为太阳的位置是无限远，所以我们认为从太阳发出的光线也都是平行的。
+      light1.position.set(10, 1, 1);
+      that.scene.add(light1);
+      // //设置光源位置
+      // that.scene.add(that.light)
+      // //向场景添加平行光
     },
     // 立方体
     initObject () {
@@ -110,35 +152,75 @@ export default {
       // that.scene.add(that.mesh)
 
       that.geometry = new that.THREE.CubeGeometry(200, 100, 50, 4, 4);
-      that.material = new that.THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+      that.material = new that.THREE.MeshLambertMaterial({ color: 0x19B2DE });
       that.mesh = new that.THREE.Mesh(that.geometry, that.material);
       that.mesh.position.set(0, 0, 0);
+      that.mesh.scale.set(1, 1, 1);
       that.scene.add(that.mesh);
 
-      let geometry2 = new that.THREE.CubeGeometry(200, 100, 50, 4, 4);
-      let material2 = new that.THREE.MeshLambertMaterial({ color: 0xFFFFFF });
-      let mesh2 = new that.THREE.Mesh(geometry2, material2);
-      mesh2.position.set(-300, 0, 0);
-      that.scene.add(mesh2);
+      // let geometry2 = new that.THREE.CubeGeometry(200, 100, 50, 4, 4);
+      // let material2 = new that.THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+      // let mesh2 = new that.THREE.Mesh(geometry2, material2);
+      // mesh2.position.set(-300, 0, 0);
+      // that.scene.add(mesh2);
 
-      let geometry3 = new that.THREE.CubeGeometry(200, 100, 50, 4, 4);
-      let material3 = new that.THREE.MeshLambertMaterial({ color: 0xFFFFFF });
-      let mesh3 = new that.THREE.Mesh(geometry3, material3);
-      mesh3.position.set(0, -150, 0);
-      that.scene.add(mesh3);
+      // let geometry3 = new that.THREE.CubeGeometry(200, 100, 50, 4, 4);
+      // let material3 = new that.THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+      // let mesh3 = new that.THREE.Mesh(geometry3, material3);
+      // mesh3.position.set(0, -150, 0);
+      // that.scene.add(mesh3);
 
-      let mesh4 = new that.THREE.Mesh(geometry3, material3);
-      mesh4.position.set(0, 150, 0);
-      that.scene.add(mesh4);
+      // let mesh4 = new that.THREE.Mesh(geometry3, material3);
+      // mesh4.position.set(0, 150, 0);
+      // that.scene.add(mesh4);
 
-      let mesh5 = new that.THREE.Mesh(geometry3, material3);
-      mesh5.position.set(300, 0, 0);
-      that.scene.add(mesh5);
+      // let mesh5 = new that.THREE.Mesh(geometry3, material3);
+      // mesh5.position.set(300, 0, 0);
+      // that.scene.add(mesh5);
 
-      let mesh6 = new that.THREE.Mesh(geometry3, material3);
-      mesh6.position.set(0, 0, -100);
-      that.scene.add(mesh6);
+      // let mesh6 = new that.THREE.Mesh(geometry3, material3);
+      // mesh6.position.set(0, 0, -100);
+      // that.scene.add(mesh6);
 
+    },
+    initModel () {
+      const that = this
+      let texture = new that.THREE.TextureLoader();
+      texture.load(`${that.publicPath}img/vein.jpg`, function (texture) {
+        let material = new that.THREE.MeshBasicMaterial({ map: texture });
+        let mesh = new that.THREE.Mesh(that.geometry, material);
+        that.scene.add(mesh);
+      });
+      // let map = new that.THREE.TextureLoader().load('./image/zbl.png') //创建加载器 实用加载器的load方法加载材质文件
+      // let material = new that.THREE.MeshLambertMaterial({ map: map }) //Lambert网格材质(MeshLambertMaterial)
+      // let cube = new that.THREE.Mesh(new that.THREE.BoxGeometry(100, 200, 100, 1, 1, 1), material) //创建一个网格 将 宽度x =100 y=200 z=100、分段数皆为1立方体 与 材质 添加进去；
+      // that.scene.add(cube) //向场景添加长方体网格对象
+    },
+    //外部模型加载函数
+    loadObj () {
+      const that = this
+      //包含材质
+      new MTLLoader().setPath(`${that.publicPath}obj/`).load('sh.mtl', materials => {
+        console.log("materials", materials);
+        materials.preload();
+        new OBJLoader().setMaterials(materials).setPath(`${that.publicPath}obj/`).load('sh.obj', obj => {
+          obj.scale.set(0.2, 0.2, 0.2);
+          obj.position.set(0, 0, 0);
+          obj.rotation.set(-5, 0, 0);
+          that.scene.add(obj);
+        });
+      });
+
+      new MTLLoader().setPath(`${that.publicPath}obj/`).load('building1.mtl', materials => {
+        console.log("materials", materials);
+        materials.preload();
+        new OBJLoader().setMaterials(materials).setPath(`${that.publicPath}obj/`).load('building1.obj', obj => {
+          obj.scale.set(0.2, 0.2, 0.2);
+          obj.position.set(-100, 0, 0);
+          obj.rotation.set(-5, 0, 0);
+          that.scene.add(obj);
+        });
+      });
     },
     // 动画
     animation () {
@@ -146,9 +228,11 @@ export default {
       const that = this
       // that.camera.position.x = that.camera.position.x + 1; // 移动相机
       // that.mesh.position.x -= 1; // 移动物体
-      that.renderer.clear();
-      that.renderer.render(that.scene, that.camera);
-      // requestAnimationFrame(that.animation);
+      // that.renderer.clear();
+      // that.renderer.render(that.scene, that.camera);
+      that.controls.update();
+      that.render()
+      requestAnimationFrame(that.animation);
       // that.stats.update();
       // that.TWEEN.update();
 
@@ -177,18 +261,24 @@ export default {
     },
     threeStart () {
       const that = this
-      that.initThree()
+      that.initRenderer()
 
       that.initScene()
       that.initCamera()
 
       that.initLight() //创建光源
+      // that.initModel()
       that.initObject()
-      that.initTween()
+      that.loadObj()
+      that.initControls()
+      // that.initTween()
 
-      that.initStats() //创建资源监控
+      // that.initStats() //创建资源监控
 
       that.animation()
+
+      //监听窗体变化
+      window.onresize = that.onWindowResize
       // that.renderer.clear()
       // that.renderer.render(that.scene, that.camera)
     }
@@ -199,16 +289,8 @@ export default {
 body {
   margin: 0;
 }
-canvas {
-  width: 100%;
-  height: 100%;
-  background-color: #eeeeee;
-}
 #canvas-frame {
-  border: none;
-  cursor: pointer;
   width: 100%;
-  height: 600px;
-  background-color: #eeeeee;
+  height: 100vh;
 }
 </style>
