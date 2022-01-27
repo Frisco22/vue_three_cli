@@ -12,7 +12,7 @@
     "core-js": "^3.6.4",
     "dat.gui": "^0.7.6",
     "stats-js": "^1.0.1",
-    "three": "^0.114.0",
+    "three": "^0.137.0",
     "three-collada-loader": "^0.0.1",
     "three-css2drender": "^1.0.0",
     "three-obj-mtl-loader": "^1.0.3",

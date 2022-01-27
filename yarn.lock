@@ -7512,10 +7512,10 @@ three@^0.105.2:
   resolved "https://registry.npm.taobao.org/three/download/three-0.105.2.tgz#d135f1549bdcf5a9acd904ba3dbf9198a0268984"
   integrity sha1-0TXxVJvc9ams2QS6Pb+RmKAmiYQ=
 
-three@^0.114.0:
-  version "0.114.0"
-  resolved "https://registry.npm.taobao.org/three/download/three-0.114.0.tgz#754d08467a950ddeef06a0c645a1302b130e455a"
-  integrity sha1-dU0IRnqVDd7vBqDGRaEwKxMORVo=
+three@^0.137.0:
+  version "0.137.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.137.0.tgz#0ebd6ba66637a332c31f234bcdd35aeec071a6e3"
+  integrity sha512-rzSDhia6cU35UCy6y+zEEws6vSgytfHqFMSaBvUcySgzwvDO6vETyswtSNi/+aVqJw8WLMwyT1mlQQ1T/dxxOA==
 
 through2@^2.0.0:
   version "2.0.5"
